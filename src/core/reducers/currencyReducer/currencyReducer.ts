@@ -1,11 +1,11 @@
-import {createSlice} from '@reduxjs/toolkit';
-import {currencies} from '../../constants/availableCurrencies';
+import { createSlice } from '@reduxjs/toolkit';
+import { currencies } from '../../constants/availableCurrencies';
 const initialState = {
   convertedCurrencies: currencies,
   exchangeRate: currencies,
   isLoading: false,
   status: '',
-  message: '',
+  message: ''
 };
 
 export const currencySlice = createSlice({
@@ -33,8 +33,8 @@ export const currencySlice = createSlice({
     actionFailid: (state, action) => {
       state.message = action.payload;
       state.isLoading = false;
-    },
-  },
+    }
+  }
 });
 
 export const {
@@ -42,7 +42,7 @@ export const {
   convertCurrencySuccess,
   getExchangeRate,
   getExchangeRateSuccess,
-  actionFailid,
+  actionFailid
 } = currencySlice.actions;
 
 export default currencySlice.reducer;

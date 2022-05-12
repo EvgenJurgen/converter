@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   scrollListContainer: {
@@ -9,23 +9,23 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     marginLeft: 'auto',
-    marginRight: 'auto',
+    marginRight: 'auto'
   },
   scrollList: {
-    alignItems: 'center',
+    alignItems: 'center'
   },
   scrollListItem: {
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   currencyName: {
     height: 40,
-    marginTop: 22,
+    marginTop: 22
   },
   costLine: {
     height: 40,
     minWidth: 200,
     margin: 12,
     borderBottomWidth: 1,
-    padding: 10,
-  },
+    padding: 10
+  }
 });

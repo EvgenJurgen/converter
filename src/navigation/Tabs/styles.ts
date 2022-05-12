@@ -1,10 +1,10 @@
-import {StyleSheet} from 'react-native';
-import {colors} from '../../core/styles/colors';
+import { StyleSheet } from 'react-native';
+import { colors } from '../../core/styles/colors';
 
 export const styles = StyleSheet.create({
   tapBar: {
-    backgroundColor: colors.WHITE,
-  },
+    backgroundColor: colors.WHITE
+  }
 });
 
 export const styleImage = (focused: boolean) =>
@@ -13,6 +13,6 @@ export const styleImage = (focused: boolean) =>
       width: 30,
       height: 30,
       top: 10,
-      tintColor: focused ? colors.TYRIAN_PURPLE : colors.MANATEE,
-    },
+      tintColor: focused ? colors.TYRIAN_PURPLE : colors.MANATEE
+    }
   });

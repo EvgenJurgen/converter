@@ -1,9 +1,9 @@
-import {StyleSheet} from 'react-native';
-import {colors} from '../../styles/colors';
+import { StyleSheet } from 'react-native';
+import { colors } from '../../styles/colors';
 
 export const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: 'center'
   },
   dropdown: {
     backgroundColor: colors.ALICE_BLUE,
@@ -16,29 +16,29 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 6,
     borderWidth: 1,
-    borderColor: colors.TYRIAN_PURPLE,
+    borderColor: colors.TYRIAN_PURPLE
   },
   dropdownListContainer: {
     width: '100%',
-    height: 200,
+    height: 200
   },
   dropdownContainer: {
-    alignItems: 'center',
+    alignItems: 'center'
   },
   dropdownList: {
     padding: 8,
     borderRadius: 6,
     width: '100%',
-    minHeight: 42,
-  },
+    minHeight: 42
+  }
 });
 
 export const styleDropdownImage = (showOption: boolean) =>
   StyleSheet.create({
     dropdownImage: {
       tintColor: colors.TYRIAN_PURPLE,
-      transform: [{rotate: showOption ? '180deg' : '0deg'}],
-    },
+      transform: [{ rotate: showOption ? '180deg' : '0deg' }]
+    }
   });
 
 export const styleDropdownItem = (isSelected: boolean) =>
@@ -54,6 +54,6 @@ export const styleDropdownItem = (isSelected: boolean) =>
       alignItems: 'center',
       marginBottom: 6,
       borderWidth: isSelected ? 2 : 0,
-      borderColor: isSelected ? colors.TYRIAN_PURPLE : '',
-    },
+      borderColor: isSelected ? colors.TYRIAN_PURPLE : ''
+    }
   });

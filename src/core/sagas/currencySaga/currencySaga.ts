@@ -1,12 +1,12 @@
-import {call, put, takeEvery} from 'redux-saga/effects';
-import {currenciesNames} from '../../constants/availableCurrencies';
-import {Currency} from '../../interfaces/currencyInterface';
+import { call, put, takeEvery } from 'redux-saga/effects';
+import { currenciesNames } from '../../constants/availableCurrencies';
+import { Currency } from '../../interfaces/currencyInterface';
 import {
   convertCurrency,
   convertCurrencySuccess,
   actionFailid,
   getExchangeRate,
-  getExchangeRateSuccess,
+  getExchangeRateSuccess
 } from '../../reducers/currencyReducer/currencyReducer';
 
 const getExchangeRates = async () => {
@@ -15,60 +15,79 @@ const getExchangeRates = async () => {
     {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Host': 'currency-conversion-and-exchange-rates.p.rapidapi.com',
-        'X-RapidAPI-Key': '00867032ecmsha40501cb8611c56p1bb1f3jsna96d04862455',
-      },
-    },
+        'X-RapidAPI-Host':
+          'currency-conversion-and-exchange-rates.p.rapidapi.com',
+        'X-RapidAPI-Key': '00867032ecmsha40501cb8611c56p1bb1f3jsna96d04862455'
+      }
+    }
   );
 
   const data = await response.json();
 
-  const ratesOfAvailableCurrencies = currenciesNames.map(currencyName => {
+  const ratesOfAvailableCurrencies = currenciesNames.map((currencyName) => {
     const rate = data.rates[currencyName];
-    return {name: currencyName, rate};
+    return { name: currencyName, rate };
   });
 
   return ratesOfAvailableCurrencies;
 };
 
-function* convertCurrencyWorker({payload}: {payload: Currency; type: string}) {
+function* convertCurrencyWorker({
+  payload
+}: {
+  payload: Currency;
+  type: string;
+}) {
   try {
-    const rates: [{name: string; rate: number}] = yield call(getExchangeRates);
+    const rates: [{ name: string; rate: number }] = yield call(
+      getExchangeRates
+    );
 
-    const currentCurrency = rates.find(currency => currency.name === payload.name);
+    const currentCurrency = rates.find(
+      (currency) => currency.name === payload.name
+    );
 
     if (currentCurrency) {
-      const convertedCurrencies: Currency[] = rates.map(currency => ({
+      const convertedCurrencies: Currency[] = rates.map((currency) => ({
         name: currency.name,
-        amount: (currency.rate * payload.amount) / currentCurrency.rate,
+        amount: (currency.rate * payload.amount) / currentCurrency.rate
       }));
 
       yield put(convertCurrencySuccess(convertedCurrencies));
     } else {
       throw new Error('An unsupported currency is selected');
     }
-  } catch ({message}) {
+  } catch ({ message }) {
     yield put(actionFailid(message));
   }
 }
 
-function* getExchangeRateWorker({payload}: {payload: Currency; type: string}) {
+function* getExchangeRateWorker({
+  payload
+}: {
+  payload: Currency;
+  type: string;
+}) {
   try {
-    const rates: [{name: string; rate: number}] = yield call(getExchangeRates);
+    const rates: [{ name: string; rate: number }] = yield call(
+      getExchangeRates
+    );
 
-    const currentCurrency = rates.find(currency => currency.name === payload.name);
+    const currentCurrency = rates.find(
+      (currency) => currency.name === payload.name
+    );
 
     if (currentCurrency) {
-      const exchangeRate: Currency[] = rates.map(currency => ({
+      const exchangeRate: Currency[] = rates.map((currency) => ({
         name: currency.name,
-        amount: currency.rate / currentCurrency.rate,
+        amount: currency.rate / currentCurrency.rate
       }));
 
       yield put(getExchangeRateSuccess(exchangeRate));
     } else {
       throw new Error('An unsupported currency is selected');
     }
-  } catch ({message}) {
+  } catch ({ message }) {
     yield put(actionFailid(message));
   }
 }

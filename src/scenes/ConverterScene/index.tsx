@@ -1,25 +1,30 @@
-import React, {useEffect, useState} from 'react';
-import {TextInput} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useDispatch} from 'react-redux';
-import {useSelector} from 'react-redux';
-import {Dropdown} from '../../core/components/Dropdown';
-import {Loader} from '../../core/components/Loader/Loader';
-import {ScrollList} from '../../core/components/ScrollList';
-import {currencies} from '../../core/constants/availableCurrencies';
-import {DROPDOWN_TITLE} from '../../core/constants/dropdownTitle';
-import {Currency} from '../../core/interfaces/currencyInterface';
-import {convertCurrency} from '../../core/reducers/currencyReducer/currencyReducer';
-import {RootState} from '../../core/types/storeTypes';
-import {styles} from './styles';
+import React, { useEffect, useState } from 'react';
+import { TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { Dropdown } from '../../core/components/Dropdown';
+import { Loader } from '../../core/components/Loader/Loader';
+import { ScrollList } from '../../core/components/ScrollList';
+import { currencies } from '../../core/constants/availableCurrencies';
+import { DROPDOWN_TITLE } from '../../core/constants/dropdownTitle';
+import { Currency } from '../../core/interfaces/currencyInterface';
+import { convertCurrency } from '../../core/reducers/currencyReducer/currencyReducer';
+import { RootState } from '../../core/types/storeTypes';
+import { styles } from './styles';
 
 export const ConverterScene = () => {
   const dispatch = useDispatch();
 
-  const [selectedValue, setSelectedValue] = useState<Currency>({name: '', amount: 0});
+  const [selectedValue, setSelectedValue] = useState<Currency>({
+    name: '',
+    amount: 0
+  });
   const [stringAmount, setStringAmount] = useState('');
 
-  const {convertedCurrencies, isLoading} = useSelector((state: RootState) => state.currency);
+  const { convertedCurrencies, isLoading } = useSelector(
+    (state: RootState) => state.currency
+  );
 
   useEffect(() => {
     if (selectedValue.name) {
@@ -28,7 +33,7 @@ export const ConverterScene = () => {
   }, [dispatch, selectedValue]);
 
   const onSelect = (value: Currency) => {
-    setSelectedValue(prevState => ({...prevState, name: value.name}));
+    setSelectedValue((prevState) => ({ ...prevState, name: value.name }));
   };
 
   const handleChangeAmount = (text: string) => {
@@ -41,9 +46,12 @@ export const ConverterScene = () => {
 
     setStringAmount(validText);
     if (validText) {
-      setSelectedValue(prevState => ({...prevState, amount: parseFloat(validText)}));
+      setSelectedValue((prevState) => ({
+        ...prevState,
+        amount: parseFloat(validText)
+      }));
     } else {
-      setSelectedValue(prevState => ({...prevState, amount: 0}));
+      setSelectedValue((prevState) => ({ ...prevState, amount: 0 }));
     }
   };
 
@@ -64,7 +72,11 @@ export const ConverterScene = () => {
         selectedValue={selectedValue}
         onSelect={onSelect}
       />
-      {isLoading ? <Loader /> : <ScrollList convertedCurrencies={convertedCurrencies} />}
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <ScrollList convertedCurrencies={convertedCurrencies} />
+      )}
     </SafeAreaView>
   );
 };

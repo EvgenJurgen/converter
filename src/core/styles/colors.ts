@@ -3,5 +3,5 @@ export const colors = {
   MAKO: '#515A5A',
   ALICE_BLUE: '#f5f8fd',
   WHITE: '#ffffff',
-  MANATEE: '#9497a1',
+  MANATEE: '#9497a1'
 };
