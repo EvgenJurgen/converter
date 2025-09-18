@@ -1,11 +1,8 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { config } from 'dotenv';
 import { ConfigService } from '@nestjs/config';
-import { getEnvFilePath } from 'src/common/utils/env';
 
-config({
-  path: getEnvFilePath(),
-});
+config();
 
 const configService = new ConfigService();
 
