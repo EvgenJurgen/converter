@@ -1,13 +1,8 @@
-import {
-  Controller,
-  Get,
-  ParseArrayPipe,
-  ParseFloatPipe,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, ParseArrayPipe, Query } from '@nestjs/common';
 import { RatesService } from './rates.service';
 
 import { ParseCurrencyPipe } from 'shared/pipes/parse-currency.pipe';
+import { ParseLimitedNumberPipe } from 'shared/pipes/parse-limited-number.pipe';
 
 @Controller('rates')
 export class RatesController {
@@ -27,7 +22,7 @@ export class RatesController {
       ParseCurrencyPipe,
     )
     to: string[],
-    @Query('amount', ParseFloatPipe)
+    @Query('amount', new ParseLimitedNumberPipe())
     amount: number,
   ) {
     return this.ratesService.convert(from, to, amount);
