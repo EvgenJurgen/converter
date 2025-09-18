@@ -1,0 +1,11 @@
+FROM node:24.8.0
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "run", "start:dev"]
