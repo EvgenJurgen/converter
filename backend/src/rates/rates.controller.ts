@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { RatesService } from './rates.service';
 
+import { ParseCurrencyPipe } from 'shared/pipes/parse-currency.pipe';
+
 @Controller('rates')
 export class RatesController {
   constructor(private ratesService: RatesService) {}
@@ -17,9 +19,13 @@ export class RatesController {
 
   @Get('convert')
   convertCurrencies(
-    @Query('from')
+    @Query('from', ParseCurrencyPipe)
     from: string,
-    @Query('to', new ParseArrayPipe({ items: String, separator: ',' }))
+    @Query(
+      'to',
+      new ParseArrayPipe({ items: String, separator: ',' }),
+      ParseCurrencyPipe,
+    )
     to: string[],
     @Query('amount', ParseFloatPipe)
     amount: number,
