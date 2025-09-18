@@ -9,8 +9,8 @@ import { DataSource, In, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { Currency } from './currency.entity';
 import { ApiCurrency } from './interfaces/api-currency.interface';
 
-import { isExpired } from 'shared/utils/expiration';
-import { DATA_EXPIRATION_TIME } from 'shared/constants/expiration';
+import { isExpired } from 'src/common/utils/expiration';
+import { DATA_EXPIRATION_TIME } from 'src/common/constants/expiration';
 
 @Injectable()
 export class CurrenciesService {

@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RatesController } from './rates.controller';
 import { RatesService } from './rates.service';
 import { Rate } from './rate.entity';
-import { CurrenciesModule } from 'src/currencies/currencies.module';
+import { CurrenciesModule } from 'src/modules/currencies/currencies.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Rate]), HttpModule, CurrenciesModule],

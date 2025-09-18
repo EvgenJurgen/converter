@@ -1,5 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
-import { Currency } from 'src/currencies/currency.entity';
+import { Currency } from 'src/modules/currencies/currency.entity';
 import {
   Column,
   Entity,

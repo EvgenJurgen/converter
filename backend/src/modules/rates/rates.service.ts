@@ -9,11 +9,11 @@ import { DataSource, LessThan, Repository } from 'typeorm';
 import { Rate } from './rate.entity';
 import { ApiRate } from './interfaces/api-rate.interface';
 
-import { CurrenciesService } from 'src/currencies/currencies.service';
-import { Currency } from 'src/currencies/currency.entity';
+import { CurrenciesService } from 'src/modules/currencies/currencies.service';
+import { Currency } from 'src/modules/currencies/currency.entity';
 
-import { isExpired } from 'shared/utils/expiration';
-import { DATA_EXPIRATION_TIME } from 'shared/constants/expiration';
+import { isExpired } from 'src/common/utils/expiration';
+import { DATA_EXPIRATION_TIME } from 'src/common/constants/expiration';
 
 @Injectable()
 export class RatesService {

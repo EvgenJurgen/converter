@@ -1,10 +1,10 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { dataSourceOptions } from 'database/datasource';
-import { getEnvFilePath } from 'shared/utils/env';
-import { CurrenciesModule } from './currencies/currencies.module';
-import { RatesModule } from './rates/rates.module';
+import { dataSourceOptions } from 'src/common/database/datasource';
+import { getEnvFilePath } from 'src/common/utils/env';
+import { CurrenciesModule } from './modules/currencies/currencies.module';
+import { RatesModule } from './modules/rates/rates.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 

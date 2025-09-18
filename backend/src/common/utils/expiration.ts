@@ -1,4 +1,4 @@
-import { DATA_EXPIRATION_TIME } from 'shared/constants/expiration';
+import { DATA_EXPIRATION_TIME } from 'src/common/constants/expiration';
 
 export const isExpired = (date?: Date) => {
   if (!date) return true;
