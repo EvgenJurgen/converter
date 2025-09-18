@@ -4,7 +4,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 
 import { Currency } from './currency.entity';
 import { ApiCurrency } from './interfaces/api-currency.interface';
@@ -134,6 +134,24 @@ export class CurrenciesService {
 
   getCurrentCurrencies() {
     return this.getCurrencies(() => this.getCurrentCurrenciesFromDatabase());
+  }
+
+  getAllCurrencies() {
+    return this.getCurrencies(() => this.currencyRepository.find());
+  }
+
+  getCurrenciesByCodeAndDateRange(
+    codes: string[],
+    fromDate: Date = new Date(),
+    toDate: Date = new Date(),
+  ) {
+    return this.currencyRepository.find({
+      where: {
+        code: In(codes),
+        dateStart: LessThan(fromDate),
+        dateEnd: MoreThanOrEqual(toDate),
+      },
+    });
   }
 
   @Interval(DATA_EXPIRATION_TIME)
