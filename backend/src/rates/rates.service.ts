@@ -181,7 +181,7 @@ export class RatesService {
   }
 
   async convert(from: string, to: string[], amount: number) {
-    const currencyCodes = [from, ...to];
+    const currencyCodes = to.includes(from) ? to : [from, ...to];
     const currencies =
       await this.currenciesService.getCurrenciesByCodeAndDateRange(
         currencyCodes,
