@@ -1,8 +1,11 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from 'database/datasource';
 import { getEnvFilePath } from 'shared/utils/env';
+import { CurrenciesModule } from './currencies/currencies.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -11,8 +14,12 @@ import { getEnvFilePath } from 'shared/utils/env';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
+    ScheduleModule.forRoot(),
+    CurrenciesModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    { provide: APP_INTERCEPTOR, useClass: ClassSerializerInterceptor },
+  ],
 })
 export class AppModule {}
