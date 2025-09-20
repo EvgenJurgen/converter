@@ -1,8 +1,8 @@
-import { ROUTES } from "@/app/routing";
 import { IconButton } from "@/shared/ui";
 import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
 import { cn } from "tailwind-variants/lite";
+import type { Route } from "../types";
 
 const navigationStyles = tv({
   slots: {
@@ -13,12 +13,18 @@ const navigationStyles = tv({
   },
 });
 
-export default function Navigation({ className }: { className: string }) {
+export default function Navigation({
+  className,
+  routes,
+}: {
+  className: string;
+  routes: Route<string>[];
+}) {
   const { nav, navList, navListItem } = navigationStyles();
   return (
     <nav className={cn(nav(), className)}>
       <ul className={navList()}>
-        {ROUTES.map(({ route, name, Icon }) => (
+        {routes.map(({ route, name, Icon }) => (
           <li key={route}>
             <IconButton asChild>
               <Link to={route} className={navListItem()}>

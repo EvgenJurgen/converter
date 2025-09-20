@@ -4,6 +4,8 @@ import { Rates } from "@/pages/rates";
 import ConverterIcon from "@/shared/assets/icons/converter.svg?react";
 import CurrenciesIcon from "@/shared/assets/icons/currencies.svg?react";
 
+import type { Route } from "@/widgets/navigation";
+
 export const ROUTE_PATHS = {
   converter: "/converter",
   rates: "/rates",
@@ -11,14 +13,7 @@ export const ROUTE_PATHS = {
 
 type RoutePath = (typeof ROUTE_PATHS)[keyof typeof ROUTE_PATHS];
 
-interface Route {
-  route: RoutePath;
-  Page: React.FC;
-  name: string;
-  Icon: React.FC;
-}
-
-export const ROUTES: Route[] = [
+export const ROUTES: Route<RoutePath>[] = [
   {
     route: ROUTE_PATHS.converter,
     Page: Converter,

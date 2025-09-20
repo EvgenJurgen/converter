@@ -5,6 +5,8 @@ import { Header } from "@/widgets/header";
 import { Navigation } from "@/widgets/navigation";
 import { ThemeToggle } from "@/widgets/themeToggle";
 
+import { ROUTES } from "../routing";
+
 const layoutStyles = tv({
   slots: {
     wrapper: "min-h-full flex flex-col",
@@ -22,11 +24,11 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className={wrapper()}>
       <Header className={header()}>
-        <Navigation className={desktop()} />
+        <Navigation className={desktop()} routes={ROUTES} />
         <ThemeToggle className={themeToggle()} />
       </Header>
       <main className={main()}>{children}</main>
-      <Navigation className={mobile()} />
+      <Navigation className={mobile()} routes={ROUTES} />
     </div>
   );
 }
