@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+:root{
+    --acme-color-primary:#ffffff;
+    --acme-color-primary-foreground:#101828;
+
+    --acme-color-secondary:#87909E;
+    --acme-color-secondary-foreground:#1E2939;
+}
+
+[data-theme="dark"] {
+    --acme-color-primary:#101828;
+    --acme-color-primary-foreground:#ffffff;
+
+    --acme-color-secondary:#1E2939;
+    --acme-color-secondary-foreground:#87909E;
+}
+
+@theme inline {
+    --color-primary: var(--acme-color-primary);
+    --color-primary-foreground: var(--acme-color-primary-foreground);
+    
+    --color-secondary: var(--acme-color-secondary);
+    --color-secondary-foreground: var(--acme-color-secondary-foreground);
+}
+
