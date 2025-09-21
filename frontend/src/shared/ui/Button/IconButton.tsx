@@ -1,5 +1,6 @@
 import React from "react";
-import { cnBase, tv } from "tailwind-variants";
+import { tv } from "tailwind-variants";
+import { cn } from "tailwind-variants/lite";
 import { Slot } from "@radix-ui/react-slot";
 import { baseButton } from "./style";
 
@@ -12,18 +13,9 @@ export type IconButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   asChild?: boolean;
 };
 
-function IconButton(
-  { className, asChild, ...props }: IconButtonProps,
-  ref: React.ForwardedRef<HTMLButtonElement>
-) {
+function IconButton({ className, asChild, ...props }: IconButtonProps) {
   const Comp = asChild ? Slot : "button";
-  return (
-    <Comp
-      className={cnBase(iconButtonVariants(), className)}
-      ref={ref}
-      {...props}
-    />
-  );
+  return <Comp className={cn(iconButtonVariants(), className)} {...props} />;
 }
 IconButton.displayName = "IconButton";
-export default React.forwardRef(IconButton);
+export default IconButton;
