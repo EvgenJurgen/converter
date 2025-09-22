@@ -148,13 +148,15 @@ export class CurrenciesService {
     fromDate: Date = new Date(),
     toDate: Date = new Date(),
   ) {
-    return this.currencyRepository.find({
-      where: {
-        code: In(codes),
-        dateStart: LessThan(fromDate),
-        dateEnd: MoreThanOrEqual(toDate),
-      },
-    });
+    return this.getCurrencies(() =>
+      this.currencyRepository.find({
+        where: {
+          code: In(codes),
+          dateStart: LessThan(fromDate),
+          dateEnd: MoreThanOrEqual(toDate),
+        },
+      }),
+    );
   }
 
   @Interval(DATA_EXPIRATION_TIME)
