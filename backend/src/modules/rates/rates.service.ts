@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
@@ -66,26 +66,26 @@ export class RatesService {
       .getMany();
   }
 
-  checkIsAllCurrenciesForRatesExists(
+  getUnfoundCurrencyIdsForExchangeRates(
     rates: ApiRate[],
-    currencies?: Currency[],
+    currencies: Currency[],
   ) {
-    return (
-      !!currencies &&
-      rates.every(
-        (rate) =>
-          !!currencies.find((currency) => currency.externalId === rate.Cur_ID),
-      )
+    const currencyExternalIds = currencies.map(
+      (currency) => currency.externalId,
     );
+
+    return rates
+      .filter((rate) => !currencyExternalIds.includes(rate.Cur_ID))
+      .map((rate) => rate.Cur_ID);
   }
 
   async getCurrenciesForRates(rates: ApiRate[]) {
     const currencies = await this.currenciesService.getAllCurrencies();
 
-    const isAllCurrenciesForRatesExists =
-      this.checkIsAllCurrenciesForRatesExists(rates, currencies);
+    const unfoundCurrencyIdsForExchangeRates =
+      this.getUnfoundCurrencyIdsForExchangeRates(rates, currencies);
 
-    if (isAllCurrenciesForRatesExists) {
+    if (unfoundCurrencyIdsForExchangeRates.length === 0) {
       return currencies;
     }
 
@@ -93,15 +93,15 @@ export class RatesService {
 
     const newCurrencies = await this.currenciesService.getAllCurrencies();
 
-    const isAllNewCurrenciesForRatesExists =
-      this.checkIsAllCurrenciesForRatesExists(rates, newCurrencies);
+    const newUnfoundCurrencyIdsForExchangeRates =
+      this.getUnfoundCurrencyIdsForExchangeRates(rates, newCurrencies);
 
-    if (isAllNewCurrenciesForRatesExists) {
+    if (newUnfoundCurrencyIdsForExchangeRates.length === 0) {
       return newCurrencies;
     }
 
     throw new Error(
-      'Data synchronization error. Cannot find currency with rate.currency_id',
+      `Cannot find ${newUnfoundCurrencyIdsForExchangeRates.join(',')} rate's currencies in currencies`,
     );
   }
 
@@ -173,10 +173,13 @@ export class RatesService {
     );
   }
 
-  getIsCurrenciesCorrespond(currencyCodes: string[], currencies: Currency[]) {
-    return (
-      currencies.length === currencyCodes.length &&
-      currencies.every((currency) => currencyCodes.includes(currency.code))
+  getUnfoundCurrencyCodesInCurrencies(
+    currencyCodes: string[],
+    currencies: Currency[],
+  ) {
+    return currencyCodes.filter(
+      (currencyCode) =>
+        !currencies.find((currency) => currency.code === currencyCode),
     );
   }
 
@@ -187,13 +190,15 @@ export class RatesService {
         currencyCodes,
       );
 
-    const isCurrenciesCorrespond = this.getIsCurrenciesCorrespond(
+    const unfoundCurrencyCodes = this.getUnfoundCurrencyCodesInCurrencies(
       currencyCodes,
       currencies,
     );
 
-    if (!isCurrenciesCorrespond) {
-      throw new Error('Currencies correspond error');
+    if (unfoundCurrencyCodes.length) {
+      throw new BadRequestException(
+        `Could not find ${unfoundCurrencyCodes.join(',')} in currencies`,
+      );
     }
 
     const latestExchangeRates = await this.getExchangeRates(() =>
@@ -205,7 +210,9 @@ export class RatesService {
     );
 
     if (!baseRate) {
-      throw new Error('Could not find base currency exchange rate in rates');
+      throw new BadRequestException(
+        `Could not find ${from} currency exchange rate in rates`,
+      );
     }
 
     return currencyCodes.reduce((prev, current) => {
@@ -217,17 +224,18 @@ export class RatesService {
         );
 
         if (!targetRate) {
-          throw new Error(
-            'Could not find target currency exchange rate in rates',
+          throw new BadRequestException(
+            `Could not find ${current} currency exchange rate in rates`,
           );
         }
 
         return {
           ...prev,
-          [current]:
+          [current]: +(
             ((targetRate.scale * baseRate.rate) /
               (baseRate.scale * targetRate.rate)) *
-            amount,
+            amount
+          ).toFixed(4),
         };
       }
     }, {});
