@@ -52,10 +52,6 @@ body > main {
   margin: 0;
 }
 
-section {
-  padding: 0;
-}
-
 fieldset {
   display: flex;
   flex-direction: column;
@@ -65,16 +61,6 @@ fieldset {
 
 form {
   max-width: 100%;
-}
-
-input {
-  min-width: 0;
-  border-radius: 4px;
-  border: 1px solid #000;
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  margin-top: 0.25rem;
-  padding: 0.5rem;
 }
 
 legend {
