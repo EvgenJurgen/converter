@@ -63,7 +63,7 @@ export class RatesService {
       .getMany();
   }
 
-  async getLatestExchangeRatesByCurrencies(currencies: Currency[]) {
+  async getLatestExchangeRatesByCurrenciesFromDatabase(currencies: Currency[]) {
     const fetchedAt = await this.getWhenLatestExchangeRateWasFetched();
     return this.rateRepository
       .createQueryBuilder('rate')
@@ -211,7 +211,7 @@ export class RatesService {
     }
 
     const latestExchangeRates = await this.getExchangeRates(() =>
-      this.getLatestExchangeRatesByCurrencies(currencies),
+      this.getLatestExchangeRatesByCurrenciesFromDatabase(currencies),
     );
 
     const baseRate = latestExchangeRates.find(
