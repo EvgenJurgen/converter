@@ -4,4 +4,3 @@ pgdata
 *.log
 *.md
 .git
-.env*
