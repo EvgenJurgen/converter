@@ -1,27 +1,29 @@
 services:
-  app:
+  app_prod:
     build:
       context: .
       dockerfile: Dockerfile.prod
     ports:
       - '3000:3000'
+    env_file: '.env.production'
     environment:
       - PORT=3000
     depends_on:
-      - postgres_db
+      - postgres_db_prod
     volumes:
       - ./src:/usr/src/app/src
-  postgres_db:
+  postgres_db_prod:
     image: postgres:17
     restart: always
     ports:
       - '${DATABASE_PORT}:5432'
+    env_file: '.env.production'
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_DATABASE}
     volumes:
-      - ./pgdata:/var/lib/postgresql/data/
+      - ./pgdata/prod:/var/lib/postgresql/data/
 
 volumes:
   pgdata: null

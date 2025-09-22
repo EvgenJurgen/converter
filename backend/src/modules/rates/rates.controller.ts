@@ -8,18 +8,20 @@ import { ParseLimitedNumberPipe } from 'src/common/pipes/parse-limited-number.pi
 export class RatesController {
   constructor(private ratesService: RatesService) {}
   @Get('latest')
-  getLatestExchangeRates() {
-    return this.ratesService.getLatestExchangeRates();
+  getLatestExchangeRates(
+    @Query('base', new ParseCurrencyPipe(true)) base?: string,
+  ) {
+    return this.ratesService.getLatestExchangeRates(base);
   }
 
   @Get('convert')
   convertCurrencies(
-    @Query('from', ParseCurrencyPipe)
+    @Query('from', new ParseCurrencyPipe())
     from: string,
     @Query(
       'to',
       new ParseArrayPipe({ items: String, separator: ',' }),
-      ParseCurrencyPipe,
+      new ParseCurrencyPipe(),
     )
     to: string[],
     @Query('amount', new ParseLimitedNumberPipe())

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
@@ -14,6 +14,7 @@ import { Currency } from 'src/modules/currencies/currency.entity';
 
 import { isExpired } from 'src/common/utils/expiration';
 import { DATA_EXPIRATION_TIME } from 'src/common/constants/expiration';
+import { API_BASE_RATE } from './constants/apiBaseRate';
 
 @Injectable()
 export class RatesService {
@@ -26,14 +27,23 @@ export class RatesService {
     private currenciesService: CurrenciesService,
   ) {}
 
-  async getLatestExchangeRatesFromApi() {
+  async getExchangeRatesFromApi(periodicity: 0 | 1) {
     const { data } = await firstValueFrom(
       this.httpService.get<ApiRate[]>(
-        `${this.configService.getOrThrow<string>('EXCHANGE_API_BASE_URL')}/Rates?Periodicity=0`,
+        `${this.configService.getOrThrow<string>('EXCHANGE_API_BASE_URL')}/Rates?Periodicity=${periodicity}`,
       ),
     );
 
     return data;
+  }
+
+  async getLatestExchangeRatesFromApi() {
+    const [dailyRates, monthlyRates] = await Promise.all([
+      this.getExchangeRatesFromApi(0),
+      this.getExchangeRatesFromApi(1),
+    ]);
+
+    return [...dailyRates, ...monthlyRates];
   }
 
   async getWhenLatestExchangeRateWasFetched() {
@@ -54,7 +64,7 @@ export class RatesService {
       .getMany();
   }
 
-  async getLatestExchangeRatesByCurrencies(currencies: Currency[]) {
+  async getLatestExchangeRatesByCurrenciesFromDatabase(currencies: Currency[]) {
     const fetchedAt = await this.getWhenLatestExchangeRateWasFetched();
     return this.rateRepository
       .createQueryBuilder('rate')
@@ -66,26 +76,26 @@ export class RatesService {
       .getMany();
   }
 
-  checkIsAllCurrenciesForRatesExists(
+  getUnfoundCurrencyIdsForExchangeRates(
     rates: ApiRate[],
-    currencies?: Currency[],
+    currencies: Currency[],
   ) {
-    return (
-      !!currencies &&
-      rates.every(
-        (rate) =>
-          !!currencies.find((currency) => currency.externalId === rate.Cur_ID),
-      )
+    const currencyExternalIds = currencies.map(
+      (currency) => currency.externalId,
     );
+
+    return rates
+      .filter((rate) => !currencyExternalIds.includes(rate.Cur_ID))
+      .map((rate) => rate.Cur_ID);
   }
 
   async getCurrenciesForRates(rates: ApiRate[]) {
     const currencies = await this.currenciesService.getAllCurrencies();
 
-    const isAllCurrenciesForRatesExists =
-      this.checkIsAllCurrenciesForRatesExists(rates, currencies);
+    const unfoundCurrencyIdsForExchangeRates =
+      this.getUnfoundCurrencyIdsForExchangeRates(rates, currencies);
 
-    if (isAllCurrenciesForRatesExists) {
+    if (unfoundCurrencyIdsForExchangeRates.length === 0) {
       return currencies;
     }
 
@@ -93,15 +103,15 @@ export class RatesService {
 
     const newCurrencies = await this.currenciesService.getAllCurrencies();
 
-    const isAllNewCurrenciesForRatesExists =
-      this.checkIsAllCurrenciesForRatesExists(rates, newCurrencies);
+    const newUnfoundCurrencyIdsForExchangeRates =
+      this.getUnfoundCurrencyIdsForExchangeRates(rates, newCurrencies);
 
-    if (isAllNewCurrenciesForRatesExists) {
+    if (newUnfoundCurrencyIdsForExchangeRates.length === 0) {
       return newCurrencies;
     }
 
     throw new Error(
-      'Data synchronization error. Cannot find currency with rate.currency_id',
+      `Cannot find ${newUnfoundCurrencyIdsForExchangeRates.join(',')} rate's currencies in currencies`,
     );
   }
 
@@ -141,12 +151,15 @@ export class RatesService {
 
   async getNewExchangeRates() {
     const apiRates = await this.getLatestExchangeRatesFromApi();
+
+    const rates = [...apiRates, API_BASE_RATE];
+
     const fetcheadAt = new Date();
 
-    const currencies = await this.getCurrenciesForRates(apiRates);
+    const currencies = await this.getCurrenciesForRates(rates);
 
     const databaseEntityRates = this.createDatabaseRateEntitis(
-      apiRates,
+      rates,
       currencies,
       fetcheadAt,
     );
@@ -167,16 +180,42 @@ export class RatesService {
     return await getExchangeRatesFromDatabase();
   }
 
-  async getLatestExchangeRates() {
-    return this.getExchangeRates(() =>
-      this.getLatestExchangeRatesFromDatabase(),
-    );
+  recalculateExchangeRatesBasedOnBaseCurrency(rates: Rate[], base: string) {
+    const baseRate = rates.find((rate) => rate.currency.code === base);
+    if (!baseRate) {
+      throw new BadRequestException(`Could not foind ${base} base currency`);
+    }
+
+    return rates.map(({ rate, scale, ...rest }) => {
+      const newRate = new Rate();
+      Object.assign(newRate, rest);
+      newRate.rate = +((rate * baseRate.scale) / baseRate.rate).toFixed(4);
+      newRate.scale = scale;
+
+      return newRate;
+    });
   }
 
-  getIsCurrenciesCorrespond(currencyCodes: string[], currencies: Currency[]) {
-    return (
-      currencies.length === currencyCodes.length &&
-      currencies.every((currency) => currencyCodes.includes(currency.code))
+  async getLatestExchangeRates(base?: string) {
+    const latestExchangeRates = await this.getExchangeRates(() =>
+      this.getLatestExchangeRatesFromDatabase(),
+    );
+
+    return base
+      ? this.recalculateExchangeRatesBasedOnBaseCurrency(
+          latestExchangeRates,
+          base,
+        )
+      : latestExchangeRates;
+  }
+
+  getUnfoundCurrencyCodesInCurrencies(
+    currencyCodes: string[],
+    currencies: Currency[],
+  ) {
+    return currencyCodes.filter(
+      (currencyCode) =>
+        !currencies.find((currency) => currency.code === currencyCode),
     );
   }
 
@@ -187,17 +226,19 @@ export class RatesService {
         currencyCodes,
       );
 
-    const isCurrenciesCorrespond = this.getIsCurrenciesCorrespond(
+    const unfoundCurrencyCodes = this.getUnfoundCurrencyCodesInCurrencies(
       currencyCodes,
       currencies,
     );
 
-    if (!isCurrenciesCorrespond) {
-      throw new Error('Currencies correspond error');
+    if (unfoundCurrencyCodes.length) {
+      throw new BadRequestException(
+        `Could not find ${unfoundCurrencyCodes.join(',')} in currencies`,
+      );
     }
 
     const latestExchangeRates = await this.getExchangeRates(() =>
-      this.getLatestExchangeRatesByCurrencies(currencies),
+      this.getLatestExchangeRatesByCurrenciesFromDatabase(currencies),
     );
 
     const baseRate = latestExchangeRates.find(
@@ -205,7 +246,9 @@ export class RatesService {
     );
 
     if (!baseRate) {
-      throw new Error('Could not find base currency exchange rate in rates');
+      throw new BadRequestException(
+        `Could not find ${from} currency exchange rate in rates`,
+      );
     }
 
     return currencyCodes.reduce((prev, current) => {
@@ -217,17 +260,18 @@ export class RatesService {
         );
 
         if (!targetRate) {
-          throw new Error(
-            'Could not find target currency exchange rate in rates',
+          throw new BadRequestException(
+            `Could not find ${current} currency exchange rate in rates`,
           );
         }
 
         return {
           ...prev,
-          [current]:
+          [current]: +(
             ((targetRate.scale * baseRate.rate) /
               (baseRate.scale * targetRate.rate)) *
-            amount,
+            amount
+          ).toFixed(4),
         };
       }
     }, {});

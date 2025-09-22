@@ -1,27 +1,30 @@
 services:
-  app:
+  app_dev:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - '3001:3001'
+    env_file: '.env.development'
     environment:
+      - NODE_ENV=development
       - PORT=3001
     depends_on:
-      - postgres_db
+      - postgres_db_dev
     volumes:
       - ./src:/usr/src/app/src
-  postgres_db:
+  postgres_db_dev:
     image: postgres:17
     restart: always
     ports:
       - '${DATABASE_PORT}:5432'
+    env_file: '.env.development'
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_DATABASE}
     volumes:
-      - ./pgdata:/var/lib/postgresql/data/
+      - ./pgdata/dev:/var/lib/postgresql/data/
 
 volumes:
   pgdata: null
