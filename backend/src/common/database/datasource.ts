@@ -7,8 +7,7 @@ config();
 const configService = new ConfigService();
 
 export const dataSourceOptions: DataSourceOptions = {
-  // @ts-expect-error // TypeORM expects predefined strings for type
-  type: configService.getOrThrow<string>('DATABASE_TYPE'),
+  type: 'postgres',
   host: configService.getOrThrow<string>('DATABASE_HOST'),
   port: configService.getOrThrow<number>('DATABASE_PORT'),
   username: configService.getOrThrow<string>('DATABASE_USERNAME'),
@@ -16,11 +15,8 @@ export const dataSourceOptions: DataSourceOptions = {
   database: configService.getOrThrow<string>('DATABASE_DATABASE'),
   entities: ['dist/modules/**/*.entity.js'],
   migrations: ['dist/common/database/migrations/*.js'],
-  migrationsTableName: configService.get<string>(
-    'OPTIONAL_DATABASE_MIGRATIONS_TABLE_NAME',
-  ),
-  synchronize: process.env.NODE_ENV === 'development',
-  // logging: process.env.NODE_ENV === 'development',
+  synchronize: configService.get<string>('NODE_ENV') === 'development',
+  migrationsRun: configService.get<string>('NODE_ENV') !== 'development',
 };
 
 const dataSource = new DataSource(dataSourceOptions);
