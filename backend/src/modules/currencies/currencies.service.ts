@@ -11,6 +11,7 @@ import { ApiCurrency } from './interfaces/api-currency.interface';
 
 import { isExpired } from 'src/common/utils/expiration';
 import { DATA_EXPIRATION_TIME } from 'src/common/constants/expiration';
+import { API_BASE_CURRENCY } from './constants/apiBaseCurrency';
 
 @Injectable()
 export class CurrenciesService {
@@ -108,8 +109,10 @@ export class CurrenciesService {
     const apiCurrencies = await this.getCurrenciesFromApi();
     const fetchedAt = new Date();
 
+    const currencies = [...apiCurrencies, API_BASE_CURRENCY];
+
     const databaseCurrencyEntitis = this.createDatabaseCurrencyEntitis(
-      apiCurrencies,
+      currencies,
       fetchedAt,
     );
 

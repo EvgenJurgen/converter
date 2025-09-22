@@ -14,6 +14,7 @@ import { Currency } from 'src/modules/currencies/currency.entity';
 
 import { isExpired } from 'src/common/utils/expiration';
 import { DATA_EXPIRATION_TIME } from 'src/common/constants/expiration';
+import { API_BASE_RATE } from './constants/apiBaseRate';
 
 @Injectable()
 export class RatesService {
@@ -150,12 +151,15 @@ export class RatesService {
 
   async getNewExchangeRates() {
     const apiRates = await this.getLatestExchangeRatesFromApi();
+
+    const rates = [...apiRates, API_BASE_RATE];
+
     const fetcheadAt = new Date();
 
-    const currencies = await this.getCurrenciesForRates(apiRates);
+    const currencies = await this.getCurrenciesForRates(rates);
 
     const databaseEntityRates = this.createDatabaseRateEntitis(
-      apiRates,
+      rates,
       currencies,
       fetcheadAt,
     );
