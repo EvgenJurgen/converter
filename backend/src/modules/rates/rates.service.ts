@@ -26,14 +26,23 @@ export class RatesService {
     private currenciesService: CurrenciesService,
   ) {}
 
-  async getLatestExchangeRatesFromApi() {
+  async getExchangeRatesFromApi(periodicity: 0 | 1) {
     const { data } = await firstValueFrom(
       this.httpService.get<ApiRate[]>(
-        `${this.configService.getOrThrow<string>('EXCHANGE_API_BASE_URL')}/Rates?Periodicity=0`,
+        `${this.configService.getOrThrow<string>('EXCHANGE_API_BASE_URL')}/Rates?Periodicity=${periodicity}`,
       ),
     );
 
     return data;
+  }
+
+  async getLatestExchangeRatesFromApi() {
+    const [dailyRates, monthlyRates] = await Promise.all([
+      this.getExchangeRatesFromApi(0),
+      this.getExchangeRatesFromApi(1),
+    ]);
+
+    return [...dailyRates, ...monthlyRates];
   }
 
   async getWhenLatestExchangeRateWasFetched() {
