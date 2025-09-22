@@ -2,8 +2,13 @@ import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class ParseCurrencyPipe implements PipeTransform {
+  constructor(private readonly optional = false) {}
+
   transform(value: any) {
     const validate = (val: any) => {
+      if (this.optional && (val === undefined || val === '')) {
+        return undefined;
+      }
       if (typeof val !== 'string') {
         throw new BadRequestException('Currency must be a string');
       }

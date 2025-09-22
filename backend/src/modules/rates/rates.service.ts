@@ -176,10 +176,33 @@ export class RatesService {
     return await getExchangeRatesFromDatabase();
   }
 
-  async getLatestExchangeRates() {
-    return this.getExchangeRates(() =>
+  recalculateExchangeRatesBasedOnBaseCurrency(rates: Rate[], base: string) {
+    const baseRate = rates.find((rate) => rate.currency.code === base);
+    if (!baseRate) {
+      throw new BadRequestException(`Could not foind ${base} base currency`);
+    }
+
+    return rates.map(({ rate, scale, ...rest }) => {
+      const newRate = new Rate();
+      Object.assign(newRate, rest);
+      newRate.rate = +((rate * baseRate.scale) / baseRate.rate).toFixed(4);
+      newRate.scale = scale;
+
+      return newRate;
+    });
+  }
+
+  async getLatestExchangeRates(base?: string) {
+    const latestExchangeRates = await this.getExchangeRates(() =>
       this.getLatestExchangeRatesFromDatabase(),
     );
+
+    return base
+      ? this.recalculateExchangeRatesBasedOnBaseCurrency(
+          latestExchangeRates,
+          base,
+        )
+      : latestExchangeRates;
   }
 
   getUnfoundCurrencyCodesInCurrencies(
