@@ -4,8 +4,10 @@
     --acme-color-primary:#ffffff;
     --acme-color-primary-foreground:#101828;
 
-    --acme-color-secondary:#87909E;
+    --acme-color-secondary:#e5e5e5;
     --acme-color-secondary-foreground:#1E2939;
+
+    --acme-color-error:#dc3232;
 }
 
 [data-theme="dark"] {
@@ -14,6 +16,8 @@
 
     --acme-color-secondary:#1E2939;
     --acme-color-secondary-foreground:#87909E;
+
+    --acme-color-error:#881c1c;
 }
 
 @theme inline {
@@ -22,5 +26,39 @@
     
     --color-secondary: var(--acme-color-secondary);
     --color-secondary-foreground: var(--acme-color-secondary-foreground);
+
+    --color-error: var(--acme-color-error);
 }
 
+@layer base{
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--acme-color-primary-foreground) var(--acme-color-primary);
+    }
+
+    *::-webkit-scrollbar{
+        width: 8px;
+        height: 8px;
+    }
+
+    *::-webkit-scrollbar-thumb{
+        background-color: var(--acme-color-primary-foreground);
+        border-radius: 8px;
+    }
+
+    *::-webkit-scrollbar-track{
+        background-color: var(--acme-color-primary);
+    }
+}
+
+@layer utilities {
+    .no-spinner::-webkit-inner-spin-button,
+    .no-spinner::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .no-spinner {
+        -moz-appearance: textfield;
+    }
+}
