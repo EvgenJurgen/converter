@@ -12,4 +12,5 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
     },
   },
+  server: { allowedHosts: ["kind-creation-production-82d8.up.railway.app"] },
 });
