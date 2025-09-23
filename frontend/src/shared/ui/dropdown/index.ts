@@ -1,5 +1,5 @@
 import Dropdown from "./Dropdown";
-import type { DropdownCardVariantsProp, DropdownButtonProp } from "./Dropdown";
+import type { DropdownProps } from "./Dropdown";
 
 export { Dropdown };
-export type { DropdownCardVariantsProp, DropdownButtonProp };
+export type { DropdownProps };

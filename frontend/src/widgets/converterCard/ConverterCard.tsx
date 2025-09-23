@@ -1,41 +1,34 @@
-import { useState } from "react";
 import { tv } from "tailwind-variants";
 import { cn } from "tailwind-variants/lite";
 
-import { useGetCurrentCurrenciesQuery } from "@/entities/currencies";
-import { DEFAULT_CURRENCIES, type RateQueryCurrency } from "@/entities/rates";
-
 import { ConvertCurrencies } from "@/features/convertCurrencies";
-import { SelectCurrencies } from "@/features/selectCurrencies";
+import { SelectCurrentCurrencies } from "@/features/selectCurrentCurrencies";
 
 import { Card } from "@/shared/ui";
+import { useCallback, useState } from "react";
+import type { RateQueryCurrency } from "@/entities/rates";
 
 const card = tv({
   base: "flex flex-col h-min justify-center items-center gap-10",
 });
 
 export default function ConverterCard({ className }: { className?: string }) {
-  const [selectedCurrencyCodes, setSelectedCurrencyCodes] =
-    useState(DEFAULT_CURRENCIES);
+  const [selectedCurrencies, setSelectedCurrecies] = useState<
+    RateQueryCurrency[]
+  >([]);
 
-  const handleSelectCurrency = (currency: RateQueryCurrency) => {
-    setSelectedCurrencyCodes((prev) => {
-      if (!prev.includes(currency)) return [...prev, currency];
-      if (!DEFAULT_CURRENCIES.includes(currency))
-        return [...prev.filter((curr) => curr !== currency)];
-      return prev;
-    });
-  };
-
-  const { currentData } = useGetCurrentCurrenciesQuery();
+  const handleSetSelectedCurrencies = useCallback(
+    (currencies: RateQueryCurrency[]) => {
+      setSelectedCurrecies(currencies);
+    },
+    [setSelectedCurrecies]
+  );
 
   return (
     <Card className={cn(card(), className)}>
-      <ConvertCurrencies currencies={selectedCurrencyCodes} />
-      <SelectCurrencies
-        currencies={currentData || []}
-        selectedCurrencyCodes={selectedCurrencyCodes}
-        onSelectCurrency={handleSelectCurrency}
+      <ConvertCurrencies currencies={selectedCurrencies} />
+      <SelectCurrentCurrencies
+        setSelectedCurrencies={handleSetSelectedCurrencies}
       />
     </Card>
   );

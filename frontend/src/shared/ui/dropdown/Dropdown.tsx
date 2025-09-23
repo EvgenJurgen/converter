@@ -4,6 +4,7 @@ import { tv } from "tailwind-variants";
 import { useClickOutside } from "@/shared/hooks";
 
 import { Card, type CardVariants } from "../card";
+import { Button, type ButtonVariants } from "../button";
 
 const dropdownStyles = tv({
   slots: {
@@ -12,18 +13,23 @@ const dropdownStyles = tv({
   },
 });
 
-export type DropdownCardVariantsProp = {
+export type DropdownProps = {
+  children: ReactNode;
   cardVariants?: CardVariants;
+  button?: ReactNode;
+  buttonTitle?: string;
+  buttonVariants?: ButtonVariants;
 };
 
-export type DropdownButtonProp = { button: ReactNode };
+const DROPDOWN_DEFAULT_BUTTON_TITLE = "Dropdown";
 
-export type DropdownProps = DropdownCardVariantsProp &
-  DropdownButtonProp & {
-    children: ReactNode;
-  };
-
-function Dropdown({ button, children, cardVariants }: DropdownProps) {
+function Dropdown({
+  children,
+  button,
+  buttonTitle,
+  buttonVariants,
+  cardVariants,
+}: DropdownProps) {
   const { wrapper, card } = dropdownStyles();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +39,13 @@ function Dropdown({ button, children, cardVariants }: DropdownProps) {
 
   return (
     <div className={wrapper()} ref={ref}>
-      <div onClick={() => setIsOpen(!isOpen)}>{button}</div>
+      <div onClick={() => setIsOpen(!isOpen)}>
+        {button || (
+          <Button {...buttonVariants}>
+            {buttonTitle || DROPDOWN_DEFAULT_BUTTON_TITLE}
+          </Button>
+        )}
+      </div>
 
       {isOpen && (
         <Card className={card()} {...cardVariants}>
