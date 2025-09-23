@@ -11,7 +11,7 @@
 
 ## To run the frontend you need to create .env in frontend folder according to .env.example
 
-- ### Application can be started with Docker
+- ### Application can be started with Docker use Dockerfile.dev file
 - ### Application can be started using npm i && npm run dev
 
 ### Both local clien and docker container are listening for port 5173
