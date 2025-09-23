@@ -17,8 +17,17 @@ export default function ConvertCurrencies({
 }) {
   const [amount, setAmount] = useState("1");
   const [baseCurrency, setBaseCurrency] = useState<RateQueryCurrency | null>(
-    currencies.includes("USD") ? "USD" : null
+    null
   );
+
+  useEffect(() => {
+    if (
+      !baseCurrency &&
+      currencies.map((currency) => currency.toUpperCase()).includes("USD")
+    ) {
+      setBaseCurrency("USD");
+    }
+  }, [currencies, baseCurrency]);
 
   const [convert, { currentData, error }] = useLazyConvertCurrencyQuery();
 
