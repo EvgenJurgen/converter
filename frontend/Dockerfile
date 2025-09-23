@@ -1,7 +1,12 @@
+ARG VITE_API_BASE_URL
+
 FROM node:24.8-alpine as build
 
 WORKDIR /usr/src/app
 COPY . .
+
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 RUN npm install
 RUN npm run build
